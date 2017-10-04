@@ -83,7 +83,7 @@ func TestCommandHandlerChain(t *testing.T) {
 		return nil
 	})
 
-	wrappedHandler := ChainCommandHandler(innerHandler, outerHandler)
+	wrappedHandler := ChainHandler(innerHandler, outerHandler)
 
 	bus := New()
 	bus.Register((*TestChainCommand)(nil), wrappedHandler)
@@ -118,7 +118,7 @@ func TestCommandHandlerFailEarly(t *testing.T) {
 		return expectedErr
 	})
 
-	wrappedHandler := ChainCommandHandler(innerHandler, outerHandler)
+	wrappedHandler := ChainHandler(innerHandler, outerHandler)
 
 	bus := New()
 	bus.Register((*TestChainCommand)(nil), wrappedHandler)

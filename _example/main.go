@@ -37,7 +37,7 @@ func main() {
 	})
 
 	//we could wrap handlers to be able to add middleware
-	wrappedHandler := cb.ChainCommandHandler(doSometingHandler, middlewareHandler)
+	wrappedHandler := cb.ChainHandler(doSometingHandler, middlewareHandler)
 
 	//creation and registration of the command
 	bus := cb.New()

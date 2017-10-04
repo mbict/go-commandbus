@@ -33,9 +33,9 @@ func New() CommandBus {
 	}
 }
 
-// ChainCommandHandler will wrap the handlers and call the `handler` if the `wrap` handler succeeds
+// ChainHandler will wrap the handlers and call the `handler` if the `wrap` handler succeeds
 // When an error is returned by the `wrap` handler the process will stop and return the error
-func ChainCommandHandler(handler CommandHandler, wrap CommandHandler) CommandHandler {
+func ChainHandler(handler CommandHandler, wrap CommandHandler) CommandHandler {
 	return CommandHandlerFunc(func(ctx context.Context, command Command) error {
 		if err := wrap.Handle(ctx, command); err != nil {
 			return err
