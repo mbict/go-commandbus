@@ -9,7 +9,7 @@ var ErrUnhandledCommand = errors.New("unhandled command")
 var ErrDuplicateCommandHandler = errors.New("there is already a command handler registered for this command")
 
 type Command interface {
-	CommandType() string
+	CommandName() string
 }
 
 type CommandHandler interface {
@@ -49,15 +49,15 @@ type commandBus struct {
 }
 
 func (cb *commandBus) Register(command Command, handler CommandHandler) error {
-	if _, ok := cb.handlers[command.CommandType()]; ok {
+	if _, ok := cb.handlers[command.CommandName()]; ok {
 		return ErrDuplicateCommandHandler
 	}
-	cb.handlers[command.CommandType()] = handler
+	cb.handlers[command.CommandName()] = handler
 	return nil
 }
 
 func (cb *commandBus) Handle(ctx context.Context, command Command) error {
-	if h, ok := cb.handlers[command.CommandType()]; ok {
+	if h, ok := cb.handlers[command.CommandName()]; ok {
 		return h.Handle(ctx, command)
 	}
 	return ErrUnhandledCommand

@@ -12,9 +12,9 @@ type DoSomethingCommand struct {
 	Message string
 }
 
-// CommandType is needed to identify this command
+// CommandName is needed to identify this command
 // Reflection is just too expensive for this
-func (*DoSomethingCommand) CommandType() string {
+func (*DoSomethingCommand) CommandName() string {
 	return "DoSomethingCommand"
 }
 

@@ -10,7 +10,7 @@ type TestCommand struct {
 	Called int
 }
 
-func (_ *TestCommand) CommandType() string {
+func (_ *TestCommand) CommandName() string {
 	return "test"
 }
 
@@ -66,7 +66,7 @@ type TestChainCommand struct {
 	CalledByInnerHandler int
 }
 
-func (*TestChainCommand) CommandType() string {
+func (*TestChainCommand) CommandName() string {
 	return "TestChainCommand"
 }
 
@@ -144,8 +144,8 @@ type DoSomethingCommand struct {
 	Message string
 }
 
-// CommandType is needed to identify this command
+// CommandName is needed to identify this command
 // Reflection is just too expensive for this
-func (*DoSomethingCommand) CommandType() string {
+func (*DoSomethingCommand) CommandName() string {
 	return "DoSomethingCommand"
 }
