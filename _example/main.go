@@ -1,10 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"context"
 	"errors"
-	cb "github.com/mbict/go-commandbus"
+	"fmt"
+	cb "github.com/mbict/go-commandbus/v2"
 )
 
 // DoSomethingCommand
@@ -12,22 +12,23 @@ type DoSomethingCommand struct {
 	Message string
 }
 
-// CommandName is needed to identify this command
-// Reflection is just too expensive for this
+// CommandName is only needed to identify this command without using reflection
+// It is possible to omit this method, reflection will takeover and determine the name for the command
+// Reflection could be too expensive in some situations, so you can optimise by implementing the method
 func (*DoSomethingCommand) CommandName() string {
 	return "DoSomethingCommand"
 }
 
 func main() {
 	//example of the command handler
-	doSometingHandler := cb.CommandHandlerFunc(func(ctx context.Context, command cb.Command) error {
+	doSometingHandler := cb.CommandHandlerFunc(func(ctx context.Context, command interface{}) error {
 		c := command.(*DoSomethingCommand)
 		fmt.Println("doSomeThingHandler says", c.Message)
 		return nil
 	})
 
 	//a middleware command handler, for example validation
-	middlewareHandler := cb.CommandHandlerFunc(func(_ context.Context, command cb.Command) error {
+	middlewareHandler := cb.CommandHandlerFunc(func(_ context.Context, command interface{}) error {
 		c := command.(*DoSomethingCommand)
 		if len(c.Message) < 2 {
 			//if we return an error the testHandler will not be called

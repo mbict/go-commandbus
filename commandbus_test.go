@@ -14,8 +14,9 @@ func (_ *TestCommand) CommandName() string {
 	return "test"
 }
 
+// test covers commands with the CommandName interface implemented
 func TestCommandBus(t *testing.T) {
-	commandHandler := CommandHandlerFunc(func(_ context.Context, command Command) error {
+	commandHandler := CommandHandlerFunc(func(_ context.Context, command interface{}) error {
 		test := command.(*TestCommand)
 		test.Called++
 		return nil
@@ -23,6 +24,33 @@ func TestCommandBus(t *testing.T) {
 	bus := New()
 	bus.Register((*TestCommand)(nil), commandHandler)
 	command := &TestCommand{}
+
+	err := bus.Handle(nil, command)
+
+	if err != nil {
+		t.Fatalf("expected nil error, but got %v", err)
+	}
+
+	if command.Called != 1 {
+		t.Fatalf("expected command to be handled once, but is called %d times", command.Called)
+	}
+}
+
+type TestPlainCommand struct {
+	Called int
+}
+
+//covers interface commands whos name are determined by reflection
+//the command does not implement the commandName method
+func TestCommandBusWithInterfaceCommand(t *testing.T) {
+	commandHandler := CommandHandlerFunc(func(_ context.Context, command interface{}) error {
+		test := command.(*TestPlainCommand)
+		test.Called++
+		return nil
+	})
+	bus := New()
+	bus.Register((*TestPlainCommand)(nil), commandHandler)
+	command := &TestPlainCommand{}
 
 	err := bus.Handle(nil, command)
 
@@ -49,7 +77,7 @@ func TestCommandBusUnhandledCommand(t *testing.T) {
 
 func TestCommandBusRegisterDuplicateHandler(t *testing.T) {
 	bus := New()
-	emptyHandler := CommandHandlerFunc(func(_ context.Context, command Command) error { return nil })
+	emptyHandler := CommandHandlerFunc(func(_ context.Context, command interface{}) error { return nil })
 
 	if err := bus.Register((*TestCommand)(nil), emptyHandler); err != nil {
 		t.Fatalf("expected nil error, but got %v", err)
@@ -71,13 +99,13 @@ func (*TestChainCommand) CommandName() string {
 }
 
 func TestCommandHandlerChain(t *testing.T) {
-	innerHandler := CommandHandlerFunc(func(_ context.Context, command Command) error {
+	innerHandler := CommandHandlerFunc(func(_ context.Context, command interface{}) error {
 		test := command.(*TestChainCommand)
 		test.CalledByInnerHandler++
 		return nil
 	})
 
-	outerHandler := CommandHandlerFunc(func(_ context.Context, command Command) error {
+	outerHandler := CommandHandlerFunc(func(_ context.Context, command interface{}) error {
 		test := command.(*TestChainCommand)
 		test.CalledByOuterHandler++
 		return nil
@@ -106,13 +134,13 @@ func TestCommandHandlerChain(t *testing.T) {
 
 func TestCommandHandlerFailEarly(t *testing.T) {
 	expectedErr := errors.New("custom error")
-	innerHandler := CommandHandlerFunc(func(_ context.Context, command Command) error {
+	innerHandler := CommandHandlerFunc(func(_ context.Context, command interface{}) error {
 		test := command.(*TestChainCommand)
 		test.CalledByInnerHandler++
 		return nil
 	})
 
-	outerHandler := CommandHandlerFunc(func(_ context.Context, command Command) error {
+	outerHandler := CommandHandlerFunc(func(_ context.Context, command interface{}) error {
 		test := command.(*TestChainCommand)
 		test.CalledByOuterHandler++
 		return expectedErr
