@@ -40,8 +40,8 @@ type TestPlainCommand struct {
 	Called int
 }
 
-//covers interface commands whos name are determined by reflection
-//the command does not implement the commandName method
+// covers interface commands whos name are determined by reflection
+// the command does not implement the commandName method
 func TestCommandBusWithInterfaceCommand(t *testing.T) {
 	commandHandler := CommandHandlerFunc(func(_ context.Context, command interface{}) error {
 		test := command.(*TestPlainCommand)
